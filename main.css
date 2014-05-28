@@ -1,0 +1,80 @@
+body {
+	padding: 0; /* Gets rid of the automatic padding */
+	margin: 0;	/*	on HTML documents */
+	font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+}
+
+#container {
+	min-width: 1000px;	
+}
+
+#navigation {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	color: #ffffff;
+	height: 60px;
+	padding-top: 15px;
+	/* Adds shadow to the bottom of the bar */
+	-webkit-box-shadow: 0px 0px 8px 0px #000000;
+	-moz-box-shadow: 0px 0px 8px 0px #000000;
+	box-shadow: 0px 0px 8px 0px #000000;
+	/* Adds the transparent background */
+	background-color: rgba(1, 1, 1, 0.8);
+	color: rgba(1, 1, 1, 0.8);
+}
+
+#searchbar {
+	float: left
+	text-align: left;
+	margin-left: 20px;
+	margin-top: 10px;
+	width: 200px;
+	height: 50px;
+	font-size: 24px;
+}
+
+#toprightmenu {
+	float: right;
+	text-align: right;
+	width: 500px;
+	margin-right: 20px;
+	margin-top: -60px;
+	height: 50px;
+	font-size: 24px;	
+}
+
+#toprightmenu img {
+	width: 45px;
+	height: 45px;
+	vertical-align: middle;
+}
+
+#leftmenu {
+	float: left;
+	margin-left: 20px;
+	padding-top: 70px;
+	padding-bottom: 30px;	
+}
+
+#navigation a {
+	font-size: 18px;
+	padding-left: 15px;
+	padding-right: 15px;
+	color: white;
+	text-decoration: none;
+}
+
+#navigation a:hover {
+	color: grey;
+}
+
+/* This just adds some style to the placeholder text */
+
+#content {
+	width: 600px;
+	padding-top: 70px;
+	padding-bottom: 30px;
+	margin-left: auto;
+	margin-right: auto;
+}
