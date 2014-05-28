@@ -26,9 +26,25 @@ function showProfile(userId) {
     $.ajax({
       url: 'profile.php',
       type: 'post',
-      data: {'action': 'profile', 'q': userId},
+      data: {'action': 'showProfile', 'q': userId},
       success: function(data, status) {
           $('#content').html(data);     
+      }
+    });
+}
+
+function addFriend(recId, senId) {
+	
+	var e = document.getElementById("relation_type");
+	var relation = e.options[e.selectedIndex].value;
+
+    $.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'addFriend', 'receiver': recId, 'sender': senId, 'rel': relation},
+      success: function(data, status) {
+		  document.getElementById("add_friend").disabled = true;
+          document.getElementById("add_friend").innerHTML = "Request sent";   
       }
     });
 }

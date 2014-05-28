@@ -2,7 +2,7 @@
 
 include "baglan.php";
 
-if($_POST['action'] == "profile") {
+if($_POST['action'] == "showProfile") {
 
 	$q = $_POST['q'];
 	

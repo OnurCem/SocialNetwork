@@ -1,6 +1,8 @@
 <?php
 
 include "baglan.php";
+require("classes.php");
+
 session_start();
 
 if (isset($_SESSION['userId'])) {
@@ -24,10 +26,34 @@ if (isset($_SESSION['userId'])) {
 		
 		if (mysql_num_rows($result) > 0) {
 			while($row = mysql_fetch_array($result)) {
-				echo "<p><img src='" . $row['PictureURL'] . "' width='60px'>";
-				echo $row['FirstName'] . " " . $row['LastName'] . "<br>";
-				echo $row['Email'] . "<br>";
+				
+				$user = new User($row['Id'], $row['FirstName'], $row['LastName'], $row['Email'], "", "", $row['PictureURL']);
+								
+				$isFriend = mysql_query("SELECT Relationship FROM FRIENDSHIP
+										 WHERE User1Id = $userId AND User2Id = " . $user->getId());
+										 
+				if (mysql_num_rows($isFriend) > 0) {
+					
+					$row = mysql_fetch_array($isFriend);
+					$user->displayOnSearchResult($row['Relationship']);
+					
+				} else {
+					
+					$isRequestPending = mysql_query("SELECT * FROM FRIENDREQUEST
+													 WHERE SenderId = $userId AND ReceiverId = " . $user->getId());
+													 
+					if (mysql_num_rows($isRequestPending) > 0) {
+						$user->displayOnSearchResult("pending");
+					} else {
+						$user->displayOnSearchResult("notFriend");
+					}
+					
+				}
+				
+				echo mysql_error();
+				
 			}
+			
 		} else {
 			echo "<h3>User not found :(";
 		}
