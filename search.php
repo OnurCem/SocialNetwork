@@ -30,7 +30,8 @@ if (isset($_SESSION['userId'])) {
 				$user = new User($row['Id'], $row['FirstName'], $row['LastName'], $row['Email'], "", "", $row['PictureURL']);
 								
 				$isFriend = mysql_query("SELECT Relationship FROM FRIENDSHIP
-										 WHERE User1Id = $userId AND User2Id = " . $user->getId());
+										 WHERE (User1Id = $userId AND User2Id = " . $user->getId() . ") 
+										 OR (User1Id = " . $user->getId() . " AND User2Id = $userId)");
 										 
 				if (mysql_num_rows($isFriend) > 0) {
 					

@@ -7,6 +7,30 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 <script type="text/javascript">
 
+function getNotificationCount(userId) {
+	
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'getNotificationCount', 'id': userId},
+      success: function(data, status) {
+		  document.getElementById("notification_count").getElementsByTagName('a')[0].innerHTML = data;
+      }
+    });	
+}
+
+function showNotification(userId) {
+	
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'showNotification', 'id': userId},
+      success: function(data, status) {
+		  $('#content').html(data); 
+      }
+    });	
+}
+
 function searchUser() {
 
 	var input = document.getElementById("search_text").value;
@@ -48,6 +72,21 @@ function addFriend(recId, senId) {
       }
     });
 }
+
+function confirmFriend(user1Id, user2Id, relation) {
+
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'confirmFriend', 'id1': user1Id, 'id2': user2Id, 'rel': relation},
+      success: function(data, status) {
+		  document.getElementById("confirm_friend").disabled = true;
+          document.getElementById("confirm_friend").innerHTML = "Added";   
+      }
+    });
+	
+	getNotificationCount(user1Id);
+}
 	
 </script>
 
@@ -80,17 +119,16 @@ if (isset($_SESSION['userId'])) {
 	<div id="navigation">
 	
 		<div id="searchbar">
-			<div style="float:left;">
-				<form>
-					<input type="text" id="search_text">
-				</form>
-			</div>
-			<div style="float:right;">
-				<button onclick="searchUser();">Ara</button>
-			</div>
+            <form>
+                <input type="text" id="search_text">
+                <input type="button" onClick="searchUser();" value="Ara">
+            </form>
 		</div>
 		
 		<div id="toprightmenu">
+        	<div id="notification_count">
+            	<a href="#" onclick="showNotification(<?php echo $userId; ?>); return false;"></a>
+            </div>
 			<img src="<?php echo $user['PictureURL']; ?>">
 			<a href="#" onclick="showProfile(<?php echo $userId; ?>); return false;"><?php echo $user['FirstName'] . " " . $user['LastName']; ?></a>
 			<a href="logout.php">Sign out</a>
@@ -118,6 +156,12 @@ if (isset($_SESSION['userId'])) {
 	</div>
         
 </div>
+
+<script>
+	window.onload = function() {
+	  getNotificationCount(<?php echo $userId; ?>);
+	};
+</script>
 
 </body>
 </html>

@@ -50,6 +50,26 @@ body {
 	vertical-align: middle;
 }
 
+#notification_count {
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	vertical-align: middle;
+	text-align: center;
+	background: url(img/red_box.png);
+}
+
+#notification_count a {
+	font-size: 18px;
+	font-weight: bold;
+	color: white;
+}
+
+#notification_count:hover {
+	background: url(img/red_box_hover.png);
+}
+
 #leftmenu {
 	float: left;
 	margin-left: 20px;
