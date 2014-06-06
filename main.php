@@ -73,6 +73,19 @@ function addFriend(recId, senId) {
     });
 }
 
+function deleteFriend(user1Id, user2Id) {
+
+    $.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'deleteFriend', 'id1': user1Id, 'id2': user2Id},
+      success: function(data, status) {
+		  document.getElementById("delete_friend").disabled = true;
+          document.getElementById("delete_friend").innerHTML = "Deleted";   
+      }
+    });
+}
+
 function confirmFriend(user1Id, user2Id, relation) {
 
 	$.ajax({
@@ -81,17 +94,15 @@ function confirmFriend(user1Id, user2Id, relation) {
       data: {'action': 'confirmFriend', 'id1': user1Id, 'id2': user2Id, 'rel': relation},
       success: function(data, status) {
 		  document.getElementById("confirm_friend").disabled = true;
-          document.getElementById("confirm_friend").innerHTML = "Added";   
+          document.getElementById("confirm_friend").innerHTML = "Added"; 
+		  getNotificationCount(user1Id);
       }
     });
-	
-	getNotificationCount(user1Id);
 }
 	
 </script>
 
 </head>
-
 <body>
 
 <?php
@@ -135,8 +146,7 @@ if (isset($_SESSION['userId'])) {
 		</div>
 		
 	</div>
-	
-	
+
 	<div id="leftmenu">
 	
 		<h3>Deneme</h3>
@@ -148,11 +158,9 @@ if (isset($_SESSION['userId'])) {
 		<h3>Deneme</h3>
 		
 	</div> 
-	
-	
+
 	<div id="content">
 
-		
 	</div>
         
 </div>

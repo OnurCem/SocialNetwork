@@ -55,6 +55,16 @@ if($_POST['action'] == "addFriend") {
 	
 	mysql_close();
 	
+} else if($_POST['action'] == "deleteFriend") {
+
+	$id1 = $_POST['id1'];
+	$id2 = $_POST['id2'];
+	
+	mysql_query("DELETE FROM FRIENDSHIP WHERE (User1Id = $id1 AND User2Id = $id2)
+											  OR (User1Id = $id2 AND User2Id = $id1)");
+	
+	mysql_close();
+
 }
 
 ?>

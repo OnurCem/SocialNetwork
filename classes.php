@@ -92,8 +92,10 @@ class User {
 			echo "<button id='add_friend' onClick='addFriend($this->id, $userId);'>Add Friend</button>";
 			
 		} else {
+		
+			$userId = $_SESSION['userId'];
 			
-			echo $str . " <button id='delete_friend'>Delete Friend</button>";	
+			echo $str . " <button id='delete_friend' onClick='deleteFriend($this->id, $userId);'>Delete Friend</button>";	
 			
 		}
 		
