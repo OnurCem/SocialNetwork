@@ -71,9 +71,8 @@ class User {
 	
 	function displayOnSearchResult($str) {
 		
-		echo "<p><img src='" . $this->pictureURL . "' width='60px'>";
+		echo "<p><img src='" . $this->pictureURL . "' width='60px' height='60px'>";
 		echo $this->firstName . " " . $this->lastName . "<br>";
-		echo $this->email . "<br>";
 				
 		if (strcmp($str, "pending") == 0) {
 			
@@ -102,6 +101,11 @@ class User {
 		echo "<br>";
 	}
 	
+	function displayPhotoName() {
+		echo "<p><img src='" . $this->pictureURL . "' width='30px' height='30px'>";
+		echo $this->firstName . " " . $this->lastName . "<br>";
+	}
+	
 }
 
 
@@ -115,6 +119,16 @@ class Post {
 	private $attachmentPath;
 	private $userId;
 	private $postType;
+	private $likeCount;
+	
+	function __construct($postId, $content, $attachmentPath, $userId, $postType, $likeCount) {
+		$this->postId = $postId;
+		$this->content = $content;
+		$this->attachmentPath = $attachmentPath;
+		$this->userId = $userId;
+		$this->postType = $postType;
+		$this->likeCount = $likeCount;
+	}
 	
 	function getPostId() {
 		return $this->postId;
@@ -145,6 +159,19 @@ class Post {
 	}
 	function setUserId($x) {
 		$this->userId = $x;
+	}
+	
+	function displayPost() {
+	
+		$userId = $_SESSION['userId'];
+		
+		if(strcmp($this->postType, "Picture") == 0) {
+			echo "<img src = '" . $this->attachmentPath . "'>";
+		}
+		echo $this->content . "<br>";
+		echo $this->likeCount . " ";
+		echo "<button id='like_post' onClick='likePost($this->postId, $userId);'>Like</button>";
+		
 	}
 	
 }

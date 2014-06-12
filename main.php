@@ -7,6 +7,44 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 <script type="text/javascript">
 
+function share(userId) {
+
+	var input = document.getElementById("share_text").value;
+	
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'share', 'id': userId, 'q': input},
+      success: function(data, status) {
+		  getContent(userId);
+      }
+    });	
+}
+
+function getContent(userId) {
+	
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'getContent', 'id': userId},
+      success: function(data, status) {
+		  $('#content').html(data); 
+      }
+    });
+}
+
+function likePost(postId, userId) {
+	
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'likePost', 'postId': postId, 'userId': userId},
+      success: function(data, status) {
+		  document.getElementById("like_post").disabled = true;
+      }
+    });
+}
+
 function getNotificationCount(userId) {
 	
 	$.ajax({
@@ -148,26 +186,36 @@ if (isset($_SESSION['userId'])) {
 	</div>
 
 	<div id="leftmenu">
+		<p><a href="#" onclick="createGroup(<?php echo $userId; ?>); return false;">Create new group</a></p>
+		<h3>Deneme</h3>
+		<h3>Deneme</h3>
+		<h3>Deneme</h3>
+		<h3>Deneme</h3>
+		<h3>Deneme</h3>
+		<h3>Deneme</h3>
+		<h3>Deneme</h3>
+	</div>
 	
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
+	<div id="sharebar">
+		<form>
+            <textarea id="share_text" rows="1" cols="40">Write something...</textarea>
+            <input type="button" onclick="share(<?php echo $userId; ?>); return false;" value="Share">
+        </form>
 		
-	</div> 
+		<a href="#" onclick="sharePicture(<?php echo $userId; ?>); return false;">Picture</a>
+		<a href="#" onclick="shareVideo(<?php echo $userId; ?>); return false;">Video</a>
+	</div>
 
 	<div id="content">
-
+		
 	</div>
         
 </div>
 
 <script>
 	window.onload = function() {
-	  getNotificationCount(<?php echo $userId; ?>);
+		getContent(<?php echo $userId; ?>);
+		getNotificationCount(<?php echo $userId; ?>);
 	};
 </script>
 

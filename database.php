@@ -1,6 +1,7 @@
 <?php
 
 include "baglan.php";
+require("classes.php");
 
 if($_POST['action'] == "addFriend") {
 
@@ -62,6 +63,58 @@ if($_POST['action'] == "addFriend") {
 	
 	mysql_query("DELETE FROM FRIENDSHIP WHERE (User1Id = $id1 AND User2Id = $id2)
 											  OR (User1Id = $id2 AND User2Id = $id1)");
+	
+	mysql_close();
+
+} else if($_POST['action'] == "getContent") {
+
+	$userId = $_POST['id'];
+	
+	$result = mysql_query("SELECT POST.PostId, POST.UserId, Path, Content, PostType FROM POST,
+						   ((SELECT User1Id AS UserId FROM FRIENDSHIP WHERE User2Id = $userId)
+						   UNION
+						   (SELECT User2Id FROM FRIENDSHIP WHERE User1Id = $userId))USR
+						   WHERE USR.UserId = POST.UserId
+						   ORDER BY POST.PostId DESC;");
+	
+	while($row = mysql_fetch_array($result)) {
+	
+		$query = mysql_query("SELECT Id, FirstName, LastName, PictureURL FROM USER
+							  WHERE Id = " . $row['UserId']);
+		$sharer = mysql_fetch_array($query);
+		
+		$like_query = mysql_query("SELECT LikeId FROM POSTLIKE WHERE PostId = " . $row['PostId']);
+		$like_count = mysql_num_rows($like_query);
+		
+		$sharerUser = new User();
+		$sharerUser->setFirstName($sharer['FirstName']);
+		$sharerUser->setLastName($sharer['LastName']);
+		$sharerUser->setPictureURL($sharer['PictureURL']);
+		$sharerUser->displayPhotoName();
+	
+		$post = new Post($row['PostId'], $row['Content'], $row['Path'], $sharer['Id'], $row['Type'], $like_count);
+		$post->displayPost();
+	}	
+	
+	mysql_close();
+
+} else if($_POST['action'] == "share") {
+
+	$userId = $_POST['id'];
+	$input = $_POST['q'];
+	
+	$result = mysql_query("INSERT INTO POST (Content, UserId, PostType)
+						   VALUES ('$input', $userId, 'Text')");
+	
+	mysql_close();
+
+} else if($_POST['action'] == "likePost") {
+
+	$userId = $_POST['userId'];
+	$postId = $_POST['postId'];
+	
+	$result = mysql_query("INSERT INTO POSTLIKE (PostId, UserId)
+						   VALUES ($postId, $userId)");
 	
 	mysql_close();
 
