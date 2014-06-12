@@ -8,7 +8,6 @@
 <script type="text/javascript">
 
 function share(userId) {
-
 	var input = document.getElementById("share_text").value;
 	
 	$.ajax({
@@ -18,7 +17,25 @@ function share(userId) {
       success: function(data, status) {
 		  getContent(userId);
       }
-    });	
+    });
+}
+
+function openFileDialog() {
+	var file = document.getElementById("picture");
+	file.click();
+	file.addEventListener("change", function(event) {
+
+		var i = 0,
+			files = file.files,
+			len = files.length;
+
+		for (; i < len; i++) {
+			console.log("Filename: " + files[i].name);
+			console.log("Type: " + files[i].type);
+			console.log("Size: " + files[i].size + " bytes");
+		}
+
+	}, false);
 }
 
 function getContent(userId) {
@@ -41,6 +58,34 @@ function likePost(postId, userId) {
       data: {'action': 'likePost', 'postId': postId, 'userId': userId},
       success: function(data, status) {
 		  document.getElementById("like_post").disabled = true;
+		  getContent(userId);
+      }
+    });
+}
+
+function unlikePost(postId, userId) {
+	
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'unlikePost', 'postId': postId, 'userId': userId},
+      success: function(data, status) {
+		  document.getElementById("unlike_post").disabled = true;
+		  getContent(userId);
+      }
+    });
+}
+
+function shareComment(userId, postId) {
+
+	var comment = document.getElementById("comment_text").value;
+	
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'shareComment', 'postId': postId, 'userId': userId, 'q': comment},
+      success: function(data, status) {
+		  getContent(userId);
       }
     });
 }
@@ -155,6 +200,9 @@ if (isset($_SESSION['userId'])) {
 
 	$result = mysql_query("SELECT FirstName, LastName, PictureURL FROM USER WHERE Id = $userId");
 	$user = mysql_fetch_array($result);
+	
+	$_SESSION['FirstName'] = $user['FirstName'];
+	$_SESSION['LastName'] = $user['LastName'];
 
 } else {
 	header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/login.php");
@@ -168,9 +216,9 @@ if (isset($_SESSION['userId'])) {
 	<div id="navigation">
 	
 		<div id="searchbar">
-            <form>
+            <form onsubmit="searchUser(); return false;">
                 <input type="text" id="search_text">
-                <input type="button" onClick="searchUser();" value="Ara">
+                <input type="submit" value="Ara">
             </form>
 		</div>
 		
@@ -197,12 +245,13 @@ if (isset($_SESSION['userId'])) {
 	</div>
 	
 	<div id="sharebar">
-		<form>
+		<form id="share_form" enctype="multipart/form-data">
             <textarea id="share_text" rows="1" cols="40">Write something...</textarea>
             <input type="button" onclick="share(<?php echo $userId; ?>); return false;" value="Share">
+			<input type="file" id="picture" style="display:none">
         </form>
 		
-		<a href="#" onclick="sharePicture(<?php echo $userId; ?>); return false;">Picture</a>
+		<a href="#" onclick="openFileDialog(); return false;">Picture</a>
 		<a href="#" onclick="shareVideo(<?php echo $userId; ?>); return false;">Video</a>
 	</div>
 

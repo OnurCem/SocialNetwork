@@ -11,7 +11,6 @@ class User {
 	private $firstName;
 	private $lastName;
 	private $email;
-	//private $password;
 	private $birthday;
 	private $gender;
 	private $pictureURL;
@@ -161,7 +160,7 @@ class Post {
 		$this->userId = $x;
 	}
 	
-	function displayPost() {
+	function displayPost($isLiked) {
 	
 		$userId = $_SESSION['userId'];
 		
@@ -170,7 +169,11 @@ class Post {
 		}
 		echo $this->content . "<br>";
 		echo $this->likeCount . " ";
-		echo "<button id='like_post' onClick='likePost($this->postId, $userId);'>Like</button>";
+		if($isLiked) {
+			echo "<button id='unlike_post' onClick='unlikePost($this->postId, $userId);'>Unlike</button>";
+		} else {
+			echo "<button id='like_post' onClick='likePost($this->postId, $userId);'>Like</button>";
+		}
 		
 	}
 	
@@ -186,6 +189,11 @@ class Comment {
 	private $userId;
 	private $postId;
 	private $content;
+	
+	function __construct($userId, $postId) {
+		$this->userId = $userId;
+		$this->postId = $postId;
+	}
 	
 	function getCommentId() {
 		return $this->commentId;
@@ -210,6 +218,19 @@ class Comment {
 	}
 	function setContent($x) {
 		$this->content = $x;
+	}
+	
+	function displayMakeComment() {
+		echo "
+			<p>
+			<input type='text' id='comment_text'>
+			<button id='share_comment' onClick='shareComment($this->userId, $this->postId);'>Share</button>
+			<p>";
+	}
+	
+	function display($userName) {
+		echo "<p>" . $userName;
+		echo "<br>" . $this->content;	
 	}
 	
 }

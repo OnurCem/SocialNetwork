@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 include "baglan.php";
 require("classes.php");
 
@@ -70,11 +72,12 @@ if($_POST['action'] == "addFriend") {
 
 	$userId = $_POST['id'];
 	
-	$result = mysql_query("SELECT POST.PostId, POST.UserId, Path, Content, PostType FROM POST,
+	$result = mysql_query("SELECT DISTINCT POST.PostId, POST.UserId, Path, Content, PostType FROM POST,
 						   ((SELECT User1Id AS UserId FROM FRIENDSHIP WHERE User2Id = $userId)
 						   UNION
 						   (SELECT User2Id FROM FRIENDSHIP WHERE User1Id = $userId))USR
-						   WHERE USR.UserId = POST.UserId
+						   WHERE (USR.UserId = POST.UserId)
+						   OR (POST.UserId = $userId)
 						   ORDER BY POST.PostId DESC;");
 	
 	while($row = mysql_fetch_array($result)) {
@@ -83,8 +86,15 @@ if($_POST['action'] == "addFriend") {
 							  WHERE Id = " . $row['UserId']);
 		$sharer = mysql_fetch_array($query);
 		
-		$like_query = mysql_query("SELECT LikeId FROM POSTLIKE WHERE PostId = " . $row['PostId']);
+		$like_query = mysql_query("SELECT UserId FROM POSTLIKE WHERE PostId = " . $row['PostId']);
 		$like_count = mysql_num_rows($like_query);
+		$isLiked = false;
+		while($likedUser = mysql_fetch_array($like_query)) {
+			if($likedUser['UserId'] == $userId) {
+				$isLiked = true;
+				break;
+			}
+		}
 		
 		$sharerUser = new User();
 		$sharerUser->setFirstName($sharer['FirstName']);
@@ -93,7 +103,18 @@ if($_POST['action'] == "addFriend") {
 		$sharerUser->displayPhotoName();
 	
 		$post = new Post($row['PostId'], $row['Content'], $row['Path'], $sharer['Id'], $row['Type'], $like_count);
-		$post->displayPost();
+		$post->displayPost($isLiked);
+		
+		$comment = new Comment($userId, $row['PostId']);
+		$comment_query = mysql_query("SELECT UserId, Username, Content FROM COMMENT WHERE PostId = " . $row['PostId']);
+		while($comment_row = mysql_fetch_array($comment_query)) {
+			$comment->setContent($comment_row['Content']);
+			$comment->display($comment_row['Username']);
+		}
+		$comment->displayMakeComment();
+		
+		echo mysql_error();
+
 	}	
 	
 	mysql_close();
@@ -115,6 +136,29 @@ if($_POST['action'] == "addFriend") {
 	
 	$result = mysql_query("INSERT INTO POSTLIKE (PostId, UserId)
 						   VALUES ($postId, $userId)");
+	
+	mysql_close();
+
+} else if($_POST['action'] == "unlikePost") {
+
+	$userId = $_POST['userId'];
+	$postId = $_POST['postId'];
+	
+	$result = mysql_query("DELETE FROM POSTLIKE
+						   WHERE (PostId = $postId
+						   AND UserId = $userId)");
+	
+	mysql_close();
+
+} else if($_POST['action'] == "shareComment") {
+
+	$userId = $_POST['userId'];
+	$postId = $_POST['postId'];
+	$content = $_POST['q'];
+	$name = $_SESSION['FirstName'] . " " . $_SESSION['LastName'];
+	
+	$result = mysql_query("INSERT INTO COMMENT (UserId, Username, PostId, Content)
+						   VALUES ($userId, '$name', $postId, '$content')");
 	
 	mysql_close();
 
