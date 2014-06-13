@@ -165,7 +165,7 @@ class Post {
 		$userId = $_SESSION['userId'];
 		
 		if(strcmp($this->postType, "Picture") == 0) {
-			echo "<img src = '" . $this->attachmentPath . "'>";
+			echo "<img src = '" . $this->attachmentPath . "'><br>";
 		}
 		echo $this->content . "<br>";
 		echo $this->likeCount . " ";

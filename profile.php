@@ -125,8 +125,8 @@ if($_POST['action'] == "showProfile") {
 					{
 					  $new_filename = $userId . "_" . $firstName . "_" . $lastName ;
 					  
-					  $full_local_path = 'img/'.$new_filename.".".$extension ;
-					  $pictureURL = "http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/".$full_local_path;
+					  $full_local_path = 'img/' . $new_filename . "." . $extension ;
+					  $pictureURL = "http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/" . $full_local_path;
 					  move_uploaded_file($_FILES["file"]["tmp_name"], $full_local_path);
 					}
 				}

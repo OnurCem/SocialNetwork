@@ -245,10 +245,10 @@ if (isset($_SESSION['userId'])) {
 	</div>
 	
 	<div id="sharebar">
-		<form id="share_form" enctype="multipart/form-data">
-            <textarea id="share_text" rows="1" cols="40">Write something...</textarea>
-            <input type="button" onclick="share(<?php echo $userId; ?>); return false;" value="Share">
-			<input type="file" id="picture" style="display:none">
+		<form method="post" action="database.php" id="share_form" enctype="multipart/form-data">
+            <textarea name="share_text" rows="1" cols="40">Write something...</textarea>
+            <input type="submit" name="share_post" value="Share">
+			<input type="file" id="picture" name="file" style="display:none">
         </form>
 		
 		<a href="#" onclick="openFileDialog(); return false;">Picture</a>

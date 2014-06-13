@@ -102,7 +102,7 @@ if($_POST['action'] == "addFriend") {
 		$sharerUser->setPictureURL($sharer['PictureURL']);
 		$sharerUser->displayPhotoName();
 	
-		$post = new Post($row['PostId'], $row['Content'], $row['Path'], $sharer['Id'], $row['Type'], $like_count);
+		$post = new Post($row['PostId'], $row['Content'], $row['Path'], $sharer['Id'], $row['PostType'], $like_count);
 		$post->displayPost($isLiked);
 		
 		$comment = new Comment($userId, $row['PostId']);
@@ -119,15 +119,24 @@ if($_POST['action'] == "addFriend") {
 	
 	mysql_close();
 
-} else if($_POST['action'] == "share") {
+} else if($_POST['share_post']) {
 
-	$userId = $_POST['id'];
-	$input = $_POST['q'];
+	$userId = $_SESSION['userId'];
+	$input = $_POST['share_text'];
 	
 	$result = mysql_query("INSERT INTO POST (Content, UserId, PostType)
 						   VALUES ('$input', $userId, 'Text')");
+						   
+	$postId_query = mysql_query("SELECT PostId FROM POST
+								 ORDER BY PostId DESC LIMIT 1");
+	$postId = mysql_fetch_array($postId_query);
+						   
+	uploadPicture($userId, $postId['PostId']);
 	
 	mysql_close();
+	
+	header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/main.php");
+	die();
 
 } else if($_POST['action'] == "likePost") {
 
@@ -162,6 +171,58 @@ if($_POST['action'] == "addFriend") {
 	
 	mysql_close();
 
+}
+
+function uploadPicture($userId, $postId) {
+	
+	if ($_FILES["file"]["name"] != "") {
+		$allowedExts = array("jpeg", "jpg", "png");
+		$temp = explode(".", $_FILES["file"]["name"]);
+		$extension = end($temp);
+		if ((($_FILES["file"]["type"] == "image/gif")
+		|| ($_FILES["file"]["type"] == "image/jpeg")
+		|| ($_FILES["file"]["type"] == "image/jpg")
+		|| ($_FILES["file"]["type"] == "image/pjpeg")
+		|| ($_FILES["file"]["type"] == "image/x-png")
+		|| ($_FILES["file"]["type"] == "image/png"))
+		&& ($_FILES["file"]["size"] < 1000000)
+		&& in_array($extension, $allowedExts))
+		{
+			if ($_FILES["file"]["error"] > 0)
+			{
+				echo "<script language='javascript'>;
+						alert('Invalid picture');
+					  </script>;";
+				die();
+			}
+			else
+			{
+				if (file_exists("img/" . $_FILES["file"]["name"]))
+				{
+				  echo $_FILES["file"]["name"] . " already exists. ";
+				}
+				else
+				{
+				  $new_filename = $userId . "_" . $postId;
+				  
+				  $full_local_path = 'img/post/' . $new_filename . "." . $extension ;
+				  $pictureURL = "http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/" . $full_local_path;
+				  move_uploaded_file($_FILES["file"]["tmp_name"], $full_local_path);
+				}
+			}
+		}
+		else
+		{
+			echo "<script language='javascript'>;
+					alert('Invalid picture');
+				  </script>;";
+			die();
+		}
+		
+		mysql_query("UPDATE POST SET PostType = 'Picture', Path = '$pictureURL'
+					 WHERE PostId = $postId");
+	}
+	
 }
 
 ?>
