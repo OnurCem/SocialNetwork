@@ -79,6 +79,7 @@ body {
 }
 
 #leftmenu {
+	position: fixed;
 	float: left;
 	margin-left: 20px;
 	padding-top: 70px;
@@ -96,8 +97,6 @@ body {
 #navigation a:hover {
 	color: grey;
 }
-
-/* This just adds some style to the placeholder text */
 
 #content {
 	width: 600px;

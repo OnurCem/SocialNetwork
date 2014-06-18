@@ -140,6 +140,18 @@ function showProfile(userId) {
     });
 }
 
+function createGroup(userId) {
+
+    $.ajax({
+      url: 'group.php',
+      type: 'post',
+      data: {'action': 'createGroup', 'userId': userId},
+      success: function(data, status) {
+          $('#content').html(data);  
+      }
+    });
+}
+
 function addFriend(recId, senId) {
 	
 	var e = document.getElementById("relation_type");
@@ -251,8 +263,7 @@ if (isset($_SESSION['userId'])) {
 			<input type="file" id="picture" name="file" style="display:none">
         </form>
 		
-		<a href="#" onclick="openFileDialog(); return false;">Picture</a>
-		<a href="#" onclick="shareVideo(<?php echo $userId; ?>); return false;">Video</a>
+		<a href="#" onclick="openFileDialog(); return false;">Upload Picture</a>
 	</div>
 
 	<div id="content">

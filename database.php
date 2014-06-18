@@ -5,6 +5,8 @@ session_start();
 include "baglan.php";
 require("classes.php");
 
+$postContent;
+
 if($_POST['action'] == "addFriend") {
 
 	$receiver = $_POST['receiver'];
@@ -120,12 +122,14 @@ if($_POST['action'] == "addFriend") {
 	mysql_close();
 
 } else if($_POST['share_post']) {
-
+	global $postContent;
 	$userId = $_SESSION['userId'];
 	$input = $_POST['share_text'];
 	
+	detectPostType($input);
+	
 	$result = mysql_query("INSERT INTO POST (Content, UserId, PostType)
-						   VALUES ('$input', $userId, 'Text')");
+						   VALUES ('$postContent', $userId, 'Text')");
 						   
 	$postId_query = mysql_query("SELECT PostId FROM POST
 								 ORDER BY PostId DESC LIMIT 1");
@@ -170,6 +174,39 @@ if($_POST['action'] == "addFriend") {
 						   VALUES ($userId, '$name', $postId, '$content')");
 	
 	mysql_close();
+
+}
+
+function detectPostType($str) {
+	
+	$str = preg_replace_callback('#(?:https?://\S+)|(?:www.\S+)|(?:\S+\.\S+)#', function($arr)
+	{
+		global $postContent;
+		if(strpos($arr[0], 'http://') !== 0)
+		{
+			$arr[0] = 'http://' . $arr[0];
+		}
+		$url = parse_url($arr[0]);
+
+		// images
+		if(preg_match('#\.(png|jpg|gif)$#', $url['path']))
+		{
+			$postContent = '<img src="'. $arr[0] . '" />';
+			return;
+		}
+		// youtube
+		if(in_array($url['host'], array('www.youtube.com', 'youtube.com'))
+		  && $url['path'] == '/watch'
+		  && isset($url['query']))
+		{
+			parse_str($url['query'], $query);
+			$postContent = sprintf('<iframe class="embedded-video" src="http://www.youtube.com/embed/%s" width="450px" height="300px" allowfullscreen></iframe>', $query['v']);
+			return;
+		}
+		//links
+		$postContent = sprintf('<a href="%1$s">%1$s</a>', $arr[0]);
+		return;
+	}, $str);
 
 }
 
