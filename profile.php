@@ -117,7 +117,7 @@ if($_POST['action'] == "showProfile") {
 				}
 				else
 				{
-					if (file_exists("img/" . $_FILES["file"]["name"]))
+					if (file_exists("img/profile/" . $_FILES["file"]["name"]))
 					{
 					  echo $_FILES["file"]["name"] . " already exists. ";
 					}
@@ -125,7 +125,7 @@ if($_POST['action'] == "showProfile") {
 					{
 					  $new_filename = $userId . "_" . $firstName . "_" . $lastName ;
 					  
-					  $full_local_path = 'img/' . $new_filename . "." . $extension ;
+					  $full_local_path = 'img/profile/' . $new_filename . "." . $extension ;
 					  $pictureURL = "http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/" . $full_local_path;
 					  move_uploaded_file($_FILES["file"]["tmp_name"], $full_local_path);
 					}

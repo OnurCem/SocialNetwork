@@ -50,6 +50,18 @@ function getContent(userId) {
     });
 }
 
+function getGroups(userId) {
+	
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'getGroups', 'id': userId},
+      success: function(data, status) {
+		  $('#groups').html(data);
+      }
+    });
+}
+
 function likePost(postId, userId) {
 	
 	$.ajax({
@@ -152,6 +164,30 @@ function createGroup(userId) {
     });
 }
 
+function updateGroup(groupId) {
+
+    $.ajax({
+      url: 'group.php',
+      type: 'post',
+      data: {'action': 'updateGroup', 'groupId': groupId},
+      success: function(data, status) {
+          $('#content').html(data);  
+      }
+    });
+}
+
+function getGroupContent(groupId) {
+
+    $.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'getGroupContent', 'groupId': groupId},
+      success: function(data, status) {
+          $('#content').html(data);  
+      }
+    });
+}
+
 function addFriend(recId, senId) {
 	
 	var e = document.getElementById("relation_type");
@@ -215,6 +251,14 @@ if (isset($_SESSION['userId'])) {
 	
 	$_SESSION['FirstName'] = $user['FirstName'];
 	$_SESSION['LastName'] = $user['LastName'];
+	
+	if(isset($_GET['showGroup']))
+	{
+		$groupId = $_GET['showGroup'];
+		echo "<script> getGroupContent($groupId); </script>";
+	} else {
+		echo "<script> getContent($userId); </script>";
+	}
 
 } else {
 	header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/login.php");
@@ -247,19 +291,17 @@ if (isset($_SESSION['userId'])) {
 
 	<div id="leftmenu">
 		<p><a href="#" onclick="createGroup(<?php echo $userId; ?>); return false;">Create new group</a></p>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
-		<h3>Deneme</h3>
+
+		<div id="groups">
+		</div>
+		
 	</div>
 	
 	<div id="sharebar">
 		<form method="post" action="database.php" id="share_form" enctype="multipart/form-data">
             <textarea name="share_text" rows="1" cols="40">Write something...</textarea>
             <input type="submit" name="share_post" value="Share">
+			<input type="hidden" name="groupId" value="<?php echo $groupId; ?>">
 			<input type="file" id="picture" name="file" style="display:none">
         </form>
 		
@@ -274,8 +316,9 @@ if (isset($_SESSION['userId'])) {
 
 <script>
 	window.onload = function() {
-		getContent(<?php echo $userId; ?>);
+		//getContent(<?php echo $userId; ?>);
 		getNotificationCount(<?php echo $userId; ?>);
+		getGroups(<?php echo $userId; ?>);
 	};
 </script>
 

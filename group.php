@@ -20,10 +20,22 @@ if (isset($_SESSION['userId'])) {
 include "baglan.php";
 
 if($_POST['action'] == "createGroup") {
+
 	$isUpdate = false;
+	
 } else if($_POST['action'] == "updateGroup") {
+
 	$isUpdate = true;
 	$groupId = $_POST['groupId'];
+	
+	$group_query = mysql_query("SELECT GroupId, Name, PictureURL, AdminId
+								FROM GROUPINFO
+								WHERE GroupId = $groupId");
+								
+	$group_info = mysql_fetch_array($group_query);
+	
+	$groupName = $group_info['Name'];
+	
 } else {
 
 	@include_once "koruma.php";
@@ -35,11 +47,12 @@ if($_POST['action'] == "createGroup") {
 	}
 
 	if ($submit) {
-
+		
 		$error = array();
 		
 		$groupName = test_input($_POST["groupName"]);
 		$isUpdate = $_POST["isUpdate"];
+		$groupId = $_POST['groupId'];
 
 		if (empty($groupName)) {
 			$error['groupName'] = "Please enter your name";
@@ -64,15 +77,15 @@ if($_POST['action'] == "createGroup") {
 				}
 				else
 				{
-					if (file_exists("img/" . $_FILES["file"]["name"]))
+					if (file_exists("img/group/" . $_FILES["file"]["name"]))
 					{
 					  echo $_FILES["file"]["name"] . " already exists. ";
 					}
 					else
 					{
-					  $new_filename = $userId . "_" . $firstName . "_" . $lastName ;
+					  $new_filename = $userId . "_" . date("Ymd") . "_" . date("hisa");
 					  
-					  $full_local_path = 'img/' . $new_filename . "." . $extension ;
+					  $full_local_path = 'img/group/' . $new_filename . "." . $extension ;
 					  $pictureURL = "http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/" . $full_local_path;
 					  move_uploaded_file($_FILES["file"]["tmp_name"], $full_local_path);
 					}
@@ -88,14 +101,21 @@ if($_POST['action'] == "createGroup") {
 
 			if ($isUpdate) {
 				mysql_query("UPDATE GROUPINFO SET Name = '$groupName', PictureURL = '$pictureURL'
-							 WHERE GroupId = $groupId");
+							 WHERE GroupId = $groupId ");
+							 
+							 echo mysql_error();
 			} else {
 				mysql_query("INSERT INTO GROUPINFO (Name, AdminId, PictureURL)
 							 VALUES ('$groupName', $userId, '$pictureURL')");
+							 
+				$groupId_query = mysql_query("SELECT GroupId FROM GROUPINFO
+							                  ORDER BY GroupId DESC LIMIT 1");
+				$groupId = mysql_fetch_array($groupId_query);
+							 
+				mysql_query("INSERT INTO USERGROUP (UserId, GroupId)
+							 VALUES ($userId, " . $groupId['GroupId'] . ")");
 			}
-									
-			echo "<br>Your group created successfully<br><br>";
-			
+												
 			mysql_close();
 			
 			header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/main.php");
@@ -128,7 +148,7 @@ function test_input($data)
 	
 	<input type="hidden" name="pictureURL" value="<?php echo $picture; ?>">
 	<input type="hidden" name="isUpdate" value="<?php echo $isUpdate; ?>">
-
+	<input type="hidden" name="groupId" value="<?php echo $groupId; ?>">
 	<input type="submit" name="submit" value="Save Changes">
 </form>
 

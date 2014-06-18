@@ -244,7 +244,15 @@ class GroupInfo {
 
 	private $groupId;
 	private $name;
+	private $pictureURL;
 	private $adminId;
+	
+	function __construct($groupId, $name, $pictureURL, $adminId) {
+		$this->groupId = $groupId;
+		$this->name = $name;
+		$this->pictureURL = $pictureURL;
+		$this->adminId = $adminId;
+	}
 	
 	function getGroupId() {
 		return $this->groupId;
@@ -258,11 +266,29 @@ class GroupInfo {
 	function setName($x) {
 		$this->name = $x;
 	}
+	function getPictureURL() {
+		return $this->pictureURL;
+	}
+	function setPictureURL($x) {
+		$this->pictureURL = $x;
+	}
 	function getAdminId() {
 		return $this->adminId;
 	}
 	function setAdminId($x) {
 		$this->adminId = $x;
+	}
+	
+	function displayGroupInfo() {
+	
+		$userId = $_SESSION['userId'];
+		
+		echo $this->name . "<br>";
+		
+		if($userId == $this->adminId) {
+			echo "<a href='#' onClick='updateGroup($this->groupId);'>Edit group</a>";
+			echo "<br><br>";
+		}
 	}
 
 }

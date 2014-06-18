@@ -82,49 +82,66 @@ if($_POST['action'] == "addFriend") {
 						   OR (POST.UserId = $userId)
 						   ORDER BY POST.PostId DESC;");
 	
+	showPosts($result);	
+	
+	mysql_close();
+
+} else if($_POST['action'] == "getGroups") {
+
+	$userId = $_POST['id'];
+	
+	$result = mysql_query("SELECT GroupId FROM USERGROUP
+						   WHERE UserId = $userId");
+	
 	while($row = mysql_fetch_array($result)) {
 	
-		$query = mysql_query("SELECT Id, FirstName, LastName, PictureURL FROM USER
-							  WHERE Id = " . $row['UserId']);
-		$sharer = mysql_fetch_array($query);
-		
-		$like_query = mysql_query("SELECT UserId FROM POSTLIKE WHERE PostId = " . $row['PostId']);
-		$like_count = mysql_num_rows($like_query);
-		$isLiked = false;
-		while($likedUser = mysql_fetch_array($like_query)) {
-			if($likedUser['UserId'] == $userId) {
-				$isLiked = true;
-				break;
-			}
-		}
-		
-		$sharerUser = new User();
-		$sharerUser->setFirstName($sharer['FirstName']);
-		$sharerUser->setLastName($sharer['LastName']);
-		$sharerUser->setPictureURL($sharer['PictureURL']);
-		$sharerUser->displayPhotoName();
-	
-		$post = new Post($row['PostId'], $row['Content'], $row['Path'], $sharer['Id'], $row['PostType'], $like_count);
-		$post->displayPost($isLiked);
-		
-		$comment = new Comment($userId, $row['PostId']);
-		$comment_query = mysql_query("SELECT UserId, Username, Content FROM COMMENT WHERE PostId = " . $row['PostId']);
-		while($comment_row = mysql_fetch_array($comment_query)) {
-			$comment->setContent($comment_row['Content']);
-			$comment->display($comment_row['Username']);
-		}
-		$comment->displayMakeComment();
-		
-		echo mysql_error();
+		$query = mysql_query("SELECT GroupId, Name FROM GROUPINFO
+							  WHERE GroupId = " . $row['GroupId']);
 
+		$group_info = mysql_fetch_array($query);
+				
+		echo "
+			<a href='main.php?showGroup=" . $group_info['GroupId'] . "'>" . 
+			$group_info['Name'] . "</a><br>";		
+	}	
+	
+	mysql_close();
+
+} else if($_POST['action'] == "getGroupContent") {
+
+	$groupId = $_POST['groupId'];
+	
+	$group_query = mysql_query("SELECT GroupId, Name, PictureURL, AdminId
+								FROM GROUPINFO
+								WHERE GroupId = $groupId");
+								
+	$group_info = mysql_fetch_array($group_query);
+	
+	$group = new GroupInfo($group_info['GroupId'], $group_info['Name'], $group_info['PictureURL'], $group_info['AdminId']);
+	
+	$group->displayGroupInfo();
+	
+	$result = mysql_query("SELECT PostId FROM POSTGROUP
+						   WHERE GroupId = $groupId
+						   ORDER BY PostId DESC" );
+	
+	while($row = mysql_fetch_array($result)) {
+	
+		$posts = mysql_query("SELECT PostId, Content, Path, UserId, PostType
+							  FROM POST
+							  WHERE PostId = " . $row['PostId']);
+				
+		showPosts($posts);		
 	}	
 	
 	mysql_close();
 
 } else if($_POST['share_post']) {
+
 	global $postContent;
 	$userId = $_SESSION['userId'];
 	$input = $_POST['share_text'];
+	$groupId = $_POST['groupId'];
 	
 	detectPostType($input);
 	
@@ -134,7 +151,13 @@ if($_POST['action'] == "addFriend") {
 	$postId_query = mysql_query("SELECT PostId FROM POST
 								 ORDER BY PostId DESC LIMIT 1");
 	$postId = mysql_fetch_array($postId_query);
-						   
+	
+	if(isset($groupId))
+	{
+		mysql_query("INSERT INTO POSTGROUP (PostId,GroupId)
+					 VALUES (".$postId['PostId'].", $groupId)");
+    }
+	
 	uploadPicture($userId, $postId['PostId']);
 	
 	mysql_close();
@@ -178,14 +201,18 @@ if($_POST['action'] == "addFriend") {
 }
 
 function detectPostType($str) {
+
+	global $postContent;
+	$postContent = $str;
 	
 	$str = preg_replace_callback('#(?:https?://\S+)|(?:www.\S+)|(?:\S+\.\S+)#', function($arr)
 	{
+		$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 		global $postContent;
-		if(strpos($arr[0], 'http://') !== 0)
+		/*if(strpos($arr[0], 'http://') !== 0)
 		{
 			$arr[0] = 'http://' . $arr[0];
-		}
+		}*/
 		$url = parse_url($arr[0]);
 
 		// images
@@ -204,9 +231,55 @@ function detectPostType($str) {
 			return;
 		}
 		//links
-		$postContent = sprintf('<a href="%1$s">%1$s</a>', $arr[0]);
+		if(preg_match($reg_exUrl, $arr[0]))
+		{
+			$postContent = sprintf('<a href="%1$s">%1$s</a>', $arr[0]);
+			return;
+		}
+
 		return;
 	}, $str);
+
+}
+
+function showPosts($posts) {
+
+	$userId = $_SESSION['userId'];
+
+	while($row = mysql_fetch_array($posts)) {
+	
+		$query = mysql_query("SELECT Id, FirstName, LastName, PictureURL FROM USER
+							  WHERE Id = " . $row['UserId']);
+		$sharer = mysql_fetch_array($query);
+		
+		$like_query = mysql_query("SELECT UserId FROM POSTLIKE WHERE PostId = " . $row['PostId']);
+		$like_count = mysql_num_rows($like_query);
+		$isLiked = false;
+		while($likedUser = mysql_fetch_array($like_query)) {
+			if($likedUser['UserId'] == $userId) {
+				$isLiked = true;
+				break;
+			}
+		}
+		
+		$sharerUser = new User();
+		$sharerUser->setFirstName($sharer['FirstName']);
+		$sharerUser->setLastName($sharer['LastName']);
+		$sharerUser->setPictureURL($sharer['PictureURL']);
+		$sharerUser->displayPhotoName();
+	
+		$post = new Post($row['PostId'], $row['Content'], $row['Path'], $sharer['Id'], $row['PostType'], $like_count);
+		$post->displayPost($isLiked);
+		
+		$comment = new Comment($userId, $row['PostId']);
+		$comment_query = mysql_query("SELECT UserId, Username, Content FROM COMMENT WHERE PostId = " . $row['PostId']);
+		while($comment_row = mysql_fetch_array($comment_query)) {
+			$comment->setContent($comment_row['Content']);
+			$comment->display($comment_row['Username']);
+		}
+		$comment->displayMakeComment();
+
+	}
 
 }
 
