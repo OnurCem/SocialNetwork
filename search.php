@@ -51,15 +51,46 @@ if (isset($_SESSION['userId'])) {
 					
 				}
 				
-				echo mysql_error();
-				
 			}
 			
 		} else {
-			echo "<h3>User not found :(";
+			echo "<br><br>No people found :(<br>";
 		}
 		
 		mysql_query("DELETE FROM SEARCH");
+		
+		
+		
+		for ($i = 0; $i < count($words); $i++) {
+			mysql_query("INSERT INTO GROUPSEARCH (GroupId, Name, PictureURL, AdminId)
+						 SELECT GroupId, Name, PictureURL, AdminId FROM GROUPINFO
+					     WHERE Name LIKE '%$words[$i]%'");
+		}
+		
+		$result = mysql_query("SELECT DISTINCT GroupId, Name, PictureURL, AdminId FROM GROUPSEARCH");
+		
+		if (mysql_num_rows($result) > 0) {
+			while($row = mysql_fetch_array($result)) {
+				
+				$group = new GroupInfo($row['GroupId'], $row['Name'], $row['PictureURL'], $row['AdminId']);
+				
+				$isJoined_query = mysql_query("SELECT UserId FROM USERGROUP
+											   WHERE UserId = $userId
+											   AND GroupId = " . $row['GroupId']);
+				if (mysql_num_rows($isJoined_query) > 0) {
+					$isJoined = true;
+				} else {
+					$isJoined = false;
+				}
+				
+				$group->displayOnSearchResult($isJoined);
+			}
+			
+		} else {
+			echo "<br><br>No group found :(<br>";
+		}
+		
+		mysql_query("DELETE FROM GROUPSEARCH");
 
 		mysql_close();
 	}

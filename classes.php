@@ -70,8 +70,11 @@ class User {
 	
 	function displayOnSearchResult($str) {
 		
-		echo "<p><img src='" . $this->pictureURL . "' width='60px' height='60px'>";
-		echo $this->firstName . " " . $this->lastName . "<br>";
+		echo "<div id='user_search'>";
+		echo "<img src='" . $this->pictureURL . "'>";
+		echo "<div id='user_search_name'>";
+			echo $this->firstName . " " . $this->lastName;
+		echo "</div>";
 				
 		if (strcmp($str, "pending") == 0) {
 			
@@ -87,22 +90,24 @@ class User {
 					<option value='Family'>Family</option>
 				  </select>";
 				  
-			echo "<button id='add_friend' onClick='addFriend($this->id, $userId);'>Add Friend</button>";
+			echo "<button class='submit' id='$this->id" . "_add_friend' onClick='addFriend($this->id, $userId);'>Add Friend</button>";
 			
 		} else {
 		
 			$userId = $_SESSION['userId'];
 			
-			echo $str . " <button id='delete_friend' onClick='deleteFriend($this->id, $userId);'>Delete Friend</button>";	
+			echo $str . " <button class='submit' id='$this->id" . "_delete_friend' onClick='deleteFriend($this->id, $userId);'>Delete Friend</button>";	
 			
 		}
 		
-		echo "<br>";
+		echo "</div>";
 	}
 	
 	function displayPhotoName() {
-		echo "<p><img src='" . $this->pictureURL . "' width='30px' height='30px'>";
-		echo $this->firstName . " " . $this->lastName . "<br>";
+	
+		echo "<div id='post_container'>";
+		echo "<div id='post_user'><img src='" . $this->pictureURL . "'>";
+		echo $this->firstName . " " . $this->lastName . "</div>";
 	}
 	
 }
@@ -163,18 +168,24 @@ class Post {
 	function displayPost($isLiked) {
 	
 		$userId = $_SESSION['userId'];
-		
+
 		if(strcmp($this->postType, "Picture") == 0) {
-			echo "<img src = '" . $this->attachmentPath . "' width='250px'><br>";
+			echo "<img src = '" . $this->attachmentPath . "' width='250px'>";
 		} 		
 		
-		echo $this->content . "<br>";
-		echo $this->likeCount . " ";
+		echo "<div id='post_content'>";
+		echo $this->content . "</div>";
+		
+		echo "<div id='post_likes'>";
+		echo $this->likeCount . "</div>";
+		
+		echo "<div id='post_like_button'>";
 		if($isLiked) {
-			echo "<button id='unlike_post' onClick='unlikePost($this->postId, $userId);'>Unlike</button>";
+			echo "<a class='unlike_button' id='$this->postId" . "unlike_post' onClick='unlikePost($this->postId, $userId);'>Unlike</a>";
 		} else {
-			echo "<button id='like_post' onClick='likePost($this->postId, $userId);'>Like</button>";
+			echo "<a class='like_button' id='$this->postId" . "like_post' onClick='likePost($this->postId, $userId);'>Like</a>";
 		}
+		echo "</div>";
 		
 	}
 	
@@ -223,15 +234,16 @@ class Comment {
 	
 	function displayMakeComment() {
 		echo "
-			<p>
-			<input type='text' id='comment_text'>
-			<button id='share_comment' onClick='shareComment($this->userId, $this->postId);'>Share</button>
-			<p>";
+			<div id='post_comment'>
+			<input type='text' id='comment_text' placeholder='Write your comment'>
+			<button class='submit' id='share_comment' onClick='shareComment($this->userId, $this->postId);'>Share</button>
+			</div>";
+		echo "</div>";
 	}
 	
 	function display($userName) {
-		echo "<p>" . $userName;
-		echo "<br>" . $this->content;	
+		echo "<div id='post_comment_user'>" . $userName . "</div>";
+		echo "<div id='post_comment_content'>" . $this->content . "</div>";
 	}
 	
 }
@@ -283,12 +295,31 @@ class GroupInfo {
 	
 		$userId = $_SESSION['userId'];
 		
-		echo $this->name . "<br>";
+		echo "<div id='group_info'>";
+			echo "<img src='" . $this->pictureURL . "'><div>";
+			echo $this->name . "<br>";
+
+			if($userId == $this->adminId) {
+				echo "<a href='#' onClick='updateGroup($this->groupId);'>Edit group</a>";
+				echo "<br><br>";
+			}
+		echo "</div></div>";
+	}
+	
+	function displayOnSearchResult($isJoined) {
+	
+		$userId = $_SESSION['userId'];
 		
-		if($userId == $this->adminId) {
-			echo "<a href='#' onClick='updateGroup($this->groupId);'>Edit group</a>";
-			echo "<br><br>";
-		}
+		echo "<div id='group_search'>";
+			echo "<img src='" . $this->pictureURL . "'><div>";
+			echo $this->name . "<br>";
+		
+			if($isJoined) {
+				echo "<button class='submit' id='$this->groupId" . "leave_group' onClick='leaveGroup($this->groupId, $userId);'>Leave Group</button>";	
+			} else {
+				echo "<button class='submit' id='$this->groupId" . "join_group' onClick='joinGroup($this->groupId, $userId);'>Join Group</button>";
+			}
+		echo "</div></div>";
 	}
 
 }

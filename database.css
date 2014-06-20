@@ -1,0 +1,10 @@
+#friendship_request {
+	vertical-align: middle;
+	margin-bottom: 40px;
+}
+
+#friendship_request img {
+	width: 60px;
+	float: left;
+	margin-right: 10px;
+}

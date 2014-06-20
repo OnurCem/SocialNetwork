@@ -1,0 +1,97 @@
+body {
+	padding: 0; /* Gets rid of the automatic padding */
+	margin: 0;	/*	on HTML documents */
+	font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+	background: #EEE;
+}
+.basic-grey {
+    width: 600px;
+	text-align: right;
+    margin-right: auto;
+    margin-left: auto;
+	margin-top: 100px;
+    background: #EEE;
+    padding: 20px 30px 20px 30px;
+    color: #888;
+    text-shadow: 1px 1px 1px #FFF;
+    border:1px solid #DADADA;
+}
+.basic-grey h1 {
+    padding: 0px 0px 10px 40px;
+    display: block;
+    border-bottom: 1px solid #DADADA;
+    margin: -10px -30px 30px -30px;
+    color: #888;
+}
+.basic-grey h1>span {
+    display: block;
+    font-size: 11px;
+}
+.basic-grey label {
+    display: block;
+    margin: 0px 0px 5px;
+}
+.basic-grey label>span {
+    float: left;
+    width: 80px;
+    text-align: right;
+    padding-right: 10px;
+    margin-top: 10px;
+    color: #888;
+}
+.basic-grey input[type="text"], .basic-grey input[type="email"], .basic-grey input[type="password"], .basic-grey input[type="date"], .basic-grey textarea,.basic-grey select{
+    border: 1px solid #DADADA;
+    color: #888;
+    height: 24px;
+    margin-right: 6px;
+    margin-top: 20px;
+    outline: 0 none;
+    padding: 3px 3px 3px 5px;
+    width: 40%;
+}
+.basic-grey input[type="radio"] {
+    margin-top: 20px;
+}
+.basic-grey select {
+    background: #FFF url('down-arrow.png') no-repeat right;
+    background: #FFF url('down-arrow.png') no-repeat right);
+    appearance:none;
+    -webkit-appearance:none; 
+    -moz-appearance: none;
+    text-indent: 0.01px;
+    text-overflow: '';
+    width: 72%;
+    height: 30px;
+}
+.basic-grey textarea{
+    height:100px;
+}
+.basic-grey .button {
+    background: #E48F8F;
+	margin-top: 30px;
+    border: none;
+    padding: 10px 25px 10px 25px;
+    color: #FFF;
+}
+.basic-grey .button:hover {
+    background: #CF7A7A
+}
+.error {
+	color: #FF0000;
+}
+a {
+	font-size: 18px;
+	padding-left: 15px;
+	padding-right: 15px;
+	color: black;
+	text-decoration: none;
+}
+a:hover {
+	color: #CF7A7A;
+}
+#login_error {
+	margin-top: 200px;
+	color: #F00;
+	margin-left: 450px;
+	margin-bottom: -150px;
+}

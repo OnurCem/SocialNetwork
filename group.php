@@ -136,11 +136,11 @@ function test_input($data)
 	
 ?>
 
-<form id="group_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" enctype="multipart/form-data">  
+<form class="form" id="group_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" enctype="multipart/form-data">  
 	Group Name:
 	<input type="text" name="groupName" value="<?php echo $groupName; ?>">
 	<span class="error">* <?php echo $error['groupName'];?> </span>
-	<br><br>
+	<br>
 	
 	<span class="error"><?php echo $error['pictureURL'];?> </span><br>
 	<label for="file">Set group picture:</label>
@@ -149,7 +149,8 @@ function test_input($data)
 	<input type="hidden" name="pictureURL" value="<?php echo $picture; ?>">
 	<input type="hidden" name="isUpdate" value="<?php echo $isUpdate; ?>">
 	<input type="hidden" name="groupId" value="<?php echo $groupId; ?>">
-	<input type="submit" name="submit" value="Save Changes">
+	
+	<input class="submit" type="submit" name="submit" value="Save Changes">
 </form>
 
 </body>

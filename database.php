@@ -1,3 +1,9 @@
+<html>
+<head>
+<link rel="stylesheet" href="database.css" type="text/css" />
+</head>
+</html>
+
 <?php
 
 session_start();
@@ -39,10 +45,12 @@ if($_POST['action'] == "addFriend") {
 		$query = mysql_query("SELECT Id, FirstName, LastName, PictureURL FROM USER WHERE Id = " . $row['SenderId']);
 		$sender = mysql_fetch_array($query);
 		
-		echo "<p><img src='" . $sender['PictureURL'] . "' width='60px'>";
-		echo $sender['FirstName'] . " " . $sender['LastName'] . " added you as " . $row['Relationship'] . " friend";
-		echo "<button id='confirm_friend' onClick='confirmFriend(" . $userId . ", " . $sender['Id'] . ", " . 
-		"\"" . $row['Relationship'] . "\");'>Confirm</button>";
+		echo "<div id='friendship_request'>";
+			echo "<img src='" . $sender['PictureURL'] . "'>";
+			echo $sender['FirstName'] . " " . $sender['LastName'] . " added you as " . $row['Relationship'] . " friend";
+			echo "<button id='" . $sender['Id'] . "confirm_friend' class='submit' onClick='confirmFriend(" . $userId . ", " . $sender['Id'] . ", " . 
+			"\"" . $row['Relationship'] . "\");'>Confirm</button>";
+		echo "</div>";
 	}
 	
 	mysql_close();
@@ -136,6 +144,27 @@ if($_POST['action'] == "addFriend") {
 	
 	mysql_close();
 
+} else if($_POST['action'] == "joinGroup") {
+
+	$groupId = $_POST['groupId'];
+	$userId = $_POST['userId'];
+	
+	mysql_query("INSERT INTO USERGROUP (UserId, GroupId)
+				 VALUES ($userId, $groupId)");
+				 
+	mysql_close();
+
+} else if($_POST['action'] == "leaveGroup") {
+
+	$groupId = $_POST['groupId'];
+	$userId = $_POST['userId'];
+	
+	mysql_query("DELETE FROM USERGROUP
+				 WHERE UserId = $userId
+				 AND GroupId = $groupId");
+	
+	mysql_close();
+
 } else if($_POST['share_post']) {
 
 	global $postContent;
@@ -156,6 +185,9 @@ if($_POST['action'] == "addFriend") {
 	{
 		mysql_query("INSERT INTO POSTGROUP (PostId,GroupId)
 					 VALUES (".$postId['PostId'].", $groupId)");
+		
+		header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/main.php?showGroup=$groupId");
+		die();
     }
 	
 	uploadPicture($userId, $postId['PostId']);
@@ -198,6 +230,29 @@ if($_POST['action'] == "addFriend") {
 	
 	mysql_close();
 
+} else if($_POST['action'] == "getPopularPosts") {
+	
+	$result = mysql_query("SELECT PostId, COUNT(PostId) as PostCount
+						   FROM POSTLIKE
+						   GROUP BY PostId
+						   ORDER BY PostCount DESC");
+						   
+	while($row = mysql_fetch_array($result)) {
+	
+		$post_query = mysql_query("SELECT Content, UserId FROM POST
+								   WHERE PostId = " . $row['PostId']);
+		$post = mysql_fetch_array($post_query);
+		
+		$user_query = mysql_query("SELECT FirstName, LastName FROM USER
+								   WHERE Id = " . $post['UserId']);
+		$user = mysql_fetch_array($user_query);
+		
+		echo $user['FirstName'] . " " . $user['LastName'] . "<br>";
+		echo $post['Content'] . "<br><br>";
+	}
+	
+	mysql_close();
+
 }
 
 function detectPostType($str) {
@@ -227,7 +282,7 @@ function detectPostType($str) {
 		  && isset($url['query']))
 		{
 			parse_str($url['query'], $query);
-			$postContent = sprintf('<iframe class="embedded-video" src="http://www.youtube.com/embed/%s" width="450px" height="300px" allowfullscreen></iframe>', $query['v']);
+			$postContent = sprintf('<iframe class="embedded-video" src="http://www.youtube.com/embed/%s" width="350px" height="250px" allowfullscreen></iframe>', $query['v']);
 			return;
 		}
 		//links

@@ -1,10 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1254" />
-
-<style>
-.error {color: #FF0000;}
-</style>
+<link rel="stylesheet" href="form.css" type="text/css" />
 
 </head>
 
@@ -30,11 +27,11 @@ if ($submit) {
 	$password = test_input($_POST["password"]);
 	
 	if (empty($email)) {
-		$error['email'] = "Please enter a valid email address";
+		$error['email'] = "<br>Please enter a valid email address";
 	}
 	
 	if (empty($password)) {
-		$error['password'] = "Please enter your password";
+		$error['password'] = "<br>Please enter your password";
 	}
 	
 	if (count($error) == 0) {
@@ -55,18 +52,10 @@ if ($submit) {
 				header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/index.php");
 				die();
 			} else {
-				echo "Invalid email or password";
+				echo "<div id='login_error'>Invalid email or password</div>";
 			}
 			
 		}
-		
-		/*if ((strcmp($email, "onurcemsenel@gmail.com") == 0) && (strcmp($password, "123456") == 0)) {
-			$_SESSION['userId'] = "onur";
-			header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/index.php");
-			die();
-		} else {
-			echo "Invalid email or password";
-		}*/
 		
 	}
 	
@@ -82,20 +71,20 @@ function test_input($data)
 
 ?>
 
-<a href="signup.php">Sign Up</a><br><br>
-
-<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">  
+<form class="basic-grey" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">  
+	<a href="signup.php">Sign Up</a><br><br>
+	
 	Email:
 	<input type="text" name="email" value="<?php echo test_input($_POST['email']); ?>">
 	<span class="error">* <?php echo $error['email'];?></span>
-	<br><br>
+	<br>
 
 	Password:
 	<input type="password" name="password">
 	<span class="error">* <?php echo $error['password'];?></span>
-	<br><br>
+	<br>
 
-	<input type="submit" name="submit" value="Login">
+	<input class="button" type="submit" name="submit" value="Sign In">
 </form>
 
 </body>

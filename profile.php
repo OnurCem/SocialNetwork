@@ -1,9 +1,7 @@
-
 <html>
 <head>
-<style>
-.error {color: #FF0000;}
-</style>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1254" />
+
 </head>
 <body>
 
@@ -38,8 +36,6 @@ if($_POST['action'] == "showProfile") {
 		$picture = $row['PictureURL'];
 	
 		echo "<p><img src='" . $row['PictureURL'] . "' width='60px'>";
-		echo $row['FirstName'] . " " . $row['LastName'] . "<br>";
-		echo $row['Email'] . "<br>";
 	}
 
 	mysql_close();
@@ -67,35 +63,35 @@ if($_POST['action'] == "showProfile") {
 		$pictureURL = ($_POST["pictureURL"]);
 
 		if (empty($firstName)) {
-			$error['firstName'] = "Please enter your name";
+			$error['firstName'] = "<br>Please enter your name";
 		} else {
 			if (!preg_match("/^[a-zA-Z ]*$/", $firstName)) {
-				$error['firstName'] = "Only letters and white space allowed";
+				$error['firstName'] = "<br>Only letters and white space allowed";
 			}
 		}
 		
 		if (empty($lastName)) {
-			$error['lastName'] = "Please enter your last name";
+			$error['lastName'] = "<br>Please enter your last name";
 		} else {
 			if (!preg_match("/^[a-zA-Z ]*$/", $lastName)) {
-				$error['lastName'] = "Only letters and white space allowed";
+				$error['lastName'] = "<br>Only letters and white space allowed";
 			}
 		}
 		
 		if (empty($password)) {
-			$error['password'] = "You must choose a password";
+			$error['password'] = "<br>You must choose a password";
 		} else {
 			if (!preg_match("/^\S*(?=\S{6,})\S*$/D", $password)) {
-				$error['password'] = "Your password length must be 6 at least";
+				$error['password'] = "<br>Your password length must be 6 at least";
 			}
 		}
 		
 		if (empty($birthday)) {
-			$error['birthday'] = "Birthday is required";
+			$error['birthday'] = "<br>Birthday is required";
 		}
 		
 		if (empty($gender)) {
-			$error['gender'] = "Gender is required";
+			$error['gender'] = "<br>Gender is required";
 		}
 		
 		if ($_FILES["file"]["name"] != "") {
@@ -113,7 +109,7 @@ if($_POST['action'] == "showProfile") {
 			{
 				if ($_FILES["file"]["error"] > 0)
 				{
-					$error['pictureURL'] = "Invalid file";
+					$error['pictureURL'] = "<br>Invalid file";
 				}
 				else
 				{
@@ -133,7 +129,7 @@ if($_POST['action'] == "showProfile") {
 			}
 			else
 			{
-			  $error['pictureURL'] = "Invalid file";
+			  $error['pictureURL'] = "<br>Invalid file";
 			}
 		}
 
@@ -145,6 +141,9 @@ if($_POST['action'] == "showProfile") {
 			echo "<br>Your account information has been updated successfully<br><br>";
 			
 			mysql_close();	
+			
+			header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/main.php?showProfile=$userId");
+			die();
 		}
 			
 	}
@@ -162,7 +161,7 @@ function test_input($data)
 	
 ?>
 
-<form id="profile_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" enctype="multipart/form-data">  
+<form class="form" id="profile_form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" enctype="multipart/form-data">  
 	First Name:
 	<input type="text" name="firstName" value="<?php echo $firstname; ?>">
 	<span class="error">* <?php echo $error['firstName'];?> </span>
@@ -200,9 +199,9 @@ function test_input($data)
 	<label for="file">Set profile picture:</label>
 	<input type="file" name="file" id="file"><br>
 	
-	<input type="hidden" name="pictureURL" value="<?php echo $picture; ?>">
+	<input type="hidden" name="pictureURL" value="<?php echo $picture; ?>"><br>
 
-	<input type="submit" name="submit" value="Save Changes">
+	<input class="submit" type="submit" name="submit" value="Save Changes">
 </form>
 
 </body>

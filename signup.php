@@ -1,10 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1254" />
-
-<style>
-.error {color: #FF0000;}
-</style>
+<link rel="stylesheet" href="form.css" type="text/css" />
 
 </head>
 
@@ -34,51 +31,51 @@ if ($submit) {
 	$pictureURL = "http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/img/user.png";
 	
 	if (empty($firstName)) {
-		$error['firstName'] = "Please enter your name";
+		$error['firstName'] = "<br>Please enter your name";
 	} else {
 		if (!preg_match("/^[a-zA-Z ]*$/", $firstName)) {
-			$error['firstName'] = "Only letters and white space allowed";
+			$error['firstName'] = "<br>Only letters and white space allowed";
 		}
 	}
 	
 	if (empty($lastName)) {
-		$error['lastName'] = "Please enter your last name";
+		$error['lastName'] = "<br>Please enter your last name";
 	} else {
 		if (!preg_match("/^[a-zA-Z ]*$/", $lastName)) {
-			$error['lastName'] = "Only letters and white space allowed";
+			$error['lastName'] = "<br>Only letters and white space allowed";
 		}
 	}
 	
 	if (empty($email)) {
-		$error['email'] = "Please enter a valid email address";
+		$error['email'] = "<br>Please enter a valid email address";
 	} else {
 		if (!preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/", $email)) {
-			$error['email'] = "Your email address doesn't seem to be valid";
+			$error['email'] = "<br>Your email address doesn't seem to be valid";
 		} else {
 			if (empty($confirmEmail)) {
-				$error['confirmEmail'] = "Please re-enter your email";
+				$error['confirmEmail'] = "<br>Please re-enter your email";
 			} else {
 				if (strcmp($email, $confirmEmail) != 0) {
-					$error['confirmEmail'] = "Your emails do not match";
+					$error['confirmEmail'] = "<br>Your emails do not match";
 				}
 			}
 		}
 	}
 	
 	if (empty($password)) {
-		$error['password'] = "You must choose a password";
+		$error['password'] = "<br>You must choose a password";
 	} else {
 		if (!preg_match("/^\S*(?=\S{6,})\S*$/D", $password)) {
-			$error['password'] = "Your password length must be 6 at least";
+			$error['password'] = "<br>Your password length must be 6 at least";
 		}
 	}
 	
 	if (empty($birthday)) {
-		$error['birthday'] = "Birthday is required";
+		$error['birthday'] = "<br>Birthday is required";
 	}
 	
 	if (empty($gender)) {
-		$error['gender'] = "Gender is required";
+		$error['gender'] = "<br>Gender is required";
 	}
 	
 	if (count($error) == 0) {
@@ -104,8 +101,11 @@ if ($submit) {
 									'$pictureURL')");
 			
 				echo "Your account created successfully<br><br>";
-
+				
 				mysql_close();
+				
+				header("Location: http://sorubank.ege.edu.tr/~b051164/dersler/lwp/proje/login.php");
+				die();
 				
 			} else {
 				echo "This email address is already in use<br><br>";
@@ -126,36 +126,36 @@ function test_input($data)
 
 ?>
 
-<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">  
+<form class="basic-grey" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">  
 	First Name:
 	<input type="text" name="firstName" value="<?php echo test_input($_POST['firstName']); ?>">
 	<span class="error">* <?php echo $error['firstName'];?></span>
-	<br><br>
+	<br>
 
 	Last Name:
 	<input type="text" name="lastName" value="<?php echo test_input($_POST['lastName']); ?>">
 	<span class="error">* <?php echo $error['lastName'];?></span>
-	<br><br>
+	<br>
 
 	Email:
 	<input type="text" name="email" value="<?php echo test_input($_POST['email']); ?>">
 	<span class="error">* <?php echo $error['email'];?></span>
-	<br><br>
+	<br>
 
 	Re-enter Email:
 	<input type="text" name="confirmEmail" value="<?php echo test_input($_POST['confirmEmail']); ?>">
 	<span class="error">* <?php echo $error['confirmEmail'];?></span>
-	<br><br>
+	<br>
 
 	Password:
 	<input type="password" name="password">
 	<span class="error">* <?php echo $error['password'];?></span>
-	<br><br>
+	<br>
 	
 	Birthday:
 	<input type="date" name="birthday" value="<?php echo test_input($_POST['birthday']); ?>">
 	<span class="error">* <?php echo $error['birthday'];?></span>
-	<br><br>
+	<br>
 
 	Gender:
 	<input type="radio" name="gender" value="Female"
@@ -163,9 +163,9 @@ function test_input($data)
 	<input type="radio" name="gender" value="Male"
 		<?php if (strcmp($_POST["gender"], "Male") == 0) echo " checked"; ?> >Male
 	<span class="error">* <?php echo $error['gender'];?></span>
-	<br><br>
+	<br>
 
-	<input type="submit" name="submit" value="Submit">
+	<input class="button" type="submit" name="submit" value="Sign Up">
 </form>
 
 </body>

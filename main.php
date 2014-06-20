@@ -69,7 +69,7 @@ function likePost(postId, userId) {
       type: 'post',
       data: {'action': 'likePost', 'postId': postId, 'userId': userId},
       success: function(data, status) {
-		  document.getElementById("like_post").disabled = true;
+		  document.getElementById(postId + "like_post").disabled = true;
 		  getContent(userId);
       }
     });
@@ -82,7 +82,7 @@ function unlikePost(postId, userId) {
       type: 'post',
       data: {'action': 'unlikePost', 'postId': postId, 'userId': userId},
       success: function(data, status) {
-		  document.getElementById("unlike_post").disabled = true;
+		  document.getElementById(postId + "unlike_post").disabled = true;
 		  getContent(userId);
       }
     });
@@ -176,6 +176,34 @@ function updateGroup(groupId) {
     });
 }
 
+function joinGroup(groupId, userId) {
+
+    $.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'joinGroup', 'groupId': groupId, 'userId': userId},
+      success: function(data, status) {
+		  document.getElementById(groupId + "join_group").disabled = true;
+          document.getElementById(groupId + "join_group").innerHTML = "Joined"; 
+		  getGroups(userId);
+      }
+    });
+}
+
+function leaveGroup(groupId, userId) {
+
+    $.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'leaveGroup', 'groupId': groupId, 'userId': userId},
+      success: function(data, status) {
+		  document.getElementById(groupId + "leave_group").disabled = true;
+          document.getElementById(groupId + "leave_group").innerHTML = "Left"; 
+		  getGroups(userId);
+      }
+    });
+}
+
 function getGroupContent(groupId) {
 
     $.ajax({
@@ -198,8 +226,8 @@ function addFriend(recId, senId) {
       type: 'post',
       data: {'action': 'addFriend', 'receiver': recId, 'sender': senId, 'rel': relation},
       success: function(data, status) {
-		  document.getElementById("add_friend").disabled = true;
-          document.getElementById("add_friend").innerHTML = "Request sent";   
+		  document.getElementById(recId + "_add_friend").disabled = true;
+          document.getElementById(recId + "_add_friend").innerHTML = "Request sent";   
       }
     });
 }
@@ -211,8 +239,8 @@ function deleteFriend(user1Id, user2Id) {
       type: 'post',
       data: {'action': 'deleteFriend', 'id1': user1Id, 'id2': user2Id},
       success: function(data, status) {
-		  document.getElementById("delete_friend").disabled = true;
-          document.getElementById("delete_friend").innerHTML = "Deleted";   
+		  document.getElementById(user1Id + "_delete_friend").disabled = true;
+          document.getElementById(user1Id + "_delete_friend").innerHTML = "Deleted";   
       }
     });
 }
@@ -224,9 +252,21 @@ function confirmFriend(user1Id, user2Id, relation) {
       type: 'post',
       data: {'action': 'confirmFriend', 'id1': user1Id, 'id2': user2Id, 'rel': relation},
       success: function(data, status) {
-		  document.getElementById("confirm_friend").disabled = true;
-          document.getElementById("confirm_friend").innerHTML = "Added"; 
+		  document.getElementById(user2Id + "confirm_friend").disabled = true;
+          document.getElementById(user2Id + "confirm_friend").innerHTML = "Added"; 
 		  getNotificationCount(user1Id);
+      }
+    });
+}
+
+function getPopularPosts() {
+
+	$.ajax({
+      url: 'database.php',
+      type: 'post',
+      data: {'action': 'getPopularPosts'},
+      success: function(data, status) {
+		  $('#posts').html(data); 
       }
     });
 }
@@ -256,7 +296,14 @@ if (isset($_SESSION['userId'])) {
 	{
 		$groupId = $_GET['showGroup'];
 		echo "<script> getGroupContent($groupId); </script>";
-	} else {
+	}
+	else if(isset($_GET['showProfile']) && $_GET['showProfile'] == $userId)
+	{
+		$userId = $_GET['showProfile'];
+		echo "<script> showProfile($userId); </script>";
+	}
+	else
+	{
 		echo "<script> getContent($userId); </script>";
 	}
 
@@ -272,13 +319,16 @@ if (isset($_SESSION['userId'])) {
 	<div id="navigation">
 	
 		<div id="searchbar">
-            <form onsubmit="searchUser(); return false;">
-                <input type="text" id="search_text">
-                <input type="submit" value="Ara">
+            <form class="form" onsubmit="searchUser(); return false;">
+                <input type="text" id="search_text" placeholder="Search people or groups">
+                <input class="submit" type="submit" value="Search">
             </form>
 		</div>
 		
 		<div id="toprightmenu">
+			<div class="homepage_button">
+				<a class="homepage" href="main.php">Home</a>
+			</div>
         	<div id="notification_count">
             	<a href="#" onclick="showNotification(<?php echo $userId; ?>); return false;"></a>
             </div>
@@ -288,30 +338,45 @@ if (isset($_SESSION['userId'])) {
 		</div>
 		
 	</div>
+	
+	<div id="inner_container">
+	
+		<div id="leftmenu">
+			<p><a href="#" onclick="createGroup(<?php echo $userId; ?>); return false;">Create new group</a></p>
 
-	<div id="leftmenu">
-		<p><a href="#" onclick="createGroup(<?php echo $userId; ?>); return false;">Create new group</a></p>
-
-		<div id="groups">
+			<div id="groups">
+			</div>
+			
 		</div>
 		
-	</div>
-	
-	<div id="sharebar">
-		<form method="post" action="database.php" id="share_form" enctype="multipart/form-data">
-            <textarea name="share_text" rows="1" cols="40">Write something...</textarea>
-            <input type="submit" name="share_post" value="Share">
-			<input type="hidden" name="groupId" value="<?php echo $groupId; ?>">
-			<input type="file" id="picture" name="file" style="display:none">
-        </form>
+		<div id="rightmenu">
+			Popular posts
+			
+			<div id="posts">
+			</div>
+			
+		</div>
 		
-		<a href="#" onclick="openFileDialog(); return false;">Upload Picture</a>
+		<div id="sharebar">
+			<form class="form" method="post" action="database.php" id="share_form" enctype="multipart/form-data">
+				<textarea name="share_text" rows="1" cols="40" placeholder="Write your things or a link"></textarea>
+				<input class="submit" type="submit" name="share_post" value="Share">
+				<input type="hidden" name="groupId" value="<?php echo $groupId; ?>">
+				<input type="file" id="picture" name="file" style="display:none">
+				<a href="#" style="font-size: 14px" onclick="openFileDialog(); return false;">Upload Picture</a>
+			</form>
+			
+			
+		</div>
+
+		<div id="content">
+			
+		</div>
+	
 	</div>
 
-	<div id="content">
-		
-	</div>
-        
+	
+     
 </div>
 
 <script>
@@ -319,6 +384,7 @@ if (isset($_SESSION['userId'])) {
 		//getContent(<?php echo $userId; ?>);
 		getNotificationCount(<?php echo $userId; ?>);
 		getGroups(<?php echo $userId; ?>);
+		getPopularPosts();
 	};
 </script>
 
